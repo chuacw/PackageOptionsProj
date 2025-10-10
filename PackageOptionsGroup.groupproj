@@ -1,0 +1,116 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{A423BD67-A6B8-4AA7-B6FE-F83F38F4CC60}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="PackageOptionsReaderProj.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Package1.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Package2.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Package3.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="TestPackageOptionsReader.dproj">
+            <Dependencies>Package1.dproj;Package2.dproj;Package3.dproj</Dependencies>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="PackageOptionsReaderProj">
+        <MSBuild Projects="PackageOptionsReaderProj.dproj"/>
+    </Target>
+    <Target Name="PackageOptionsReaderProj:Clean">
+        <MSBuild Projects="PackageOptionsReaderProj.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="PackageOptionsReaderProj:Make">
+        <MSBuild Projects="PackageOptionsReaderProj.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Package1">
+        <MSBuild Projects="Package1.dproj"/>
+    </Target>
+    <Target Name="Package1:Clean">
+        <MSBuild Projects="Package1.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="Package1:Make">
+        <MSBuild Projects="Package1.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Package2">
+        <MSBuild Projects="Package2.dproj"/>
+    </Target>
+    <Target Name="Package2:Clean">
+        <MSBuild Projects="Package2.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="Package2:Make">
+        <MSBuild Projects="Package2.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Package3">
+        <MSBuild Projects="Package3.dproj"/>
+    </Target>
+    <Target Name="Package3:Clean">
+        <MSBuild Projects="Package3.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="Package3:Make">
+        <MSBuild Projects="Package3.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="TestPackageOptionsReader" DependsOnTargets="Package1;Package2;Package3">
+        <MSBuild Projects="TestPackageOptionsReader.dproj"/>
+    </Target>
+    <Target Name="TestPackageOptionsReader:Clean" DependsOnTargets="Package1:Clean;Package2:Clean;Package3:Clean">
+        <MSBuild Projects="TestPackageOptionsReader.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="TestPackageOptionsReader:Make" DependsOnTargets="Package1:Make;Package2:Make;Package3:Make">
+        <MSBuild Projects="TestPackageOptionsReader.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="PackageOptionsReaderProj;Package1;Package2;Package3;TestPackageOptionsReader"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="PackageOptionsReaderProj:Clean;Package1:Clean;Package2:Clean;Package3:Clean;TestPackageOptionsReader:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="PackageOptionsReaderProj:Make;Package1:Make;Package2:Make;Package3:Make;TestPackageOptionsReader:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+    <ItemGroup Condition="'$(BuildGroup)'=='Build dependencies'">
+        <BuildGroupProject Include="TestPackageOptionsReader.dproj">
+            <ProjectGuid>{725F7328-EABB-4AEC-8126-B75E98BB67FB}</ProjectGuid>
+            <Configurations>Debug</Configurations>
+            <Platforms>Win32</Platforms>
+            <Enabled>True</Enabled>
+        </BuildGroupProject>
+        <BuildGroupProject Include="PackageOptionsReaderProj.dproj">
+            <ProjectGuid>{891EBE72-B810-4542-9F48-BDCCB84269A1}</ProjectGuid>
+            <Configurations>Debug</Configurations>
+            <Platforms>Win32</Platforms>
+            <Enabled>True</Enabled>
+        </BuildGroupProject>
+        <BuildGroupProject Include="Package2.dproj">
+            <ProjectGuid>{17F0DA82-937D-47E6-8F10-C0E689E6C7C8}</ProjectGuid>
+            <Configurations>Debug</Configurations>
+            <Platforms>Win32</Platforms>
+            <Enabled>True</Enabled>
+        </BuildGroupProject>
+        <BuildGroupProject Include="Package3.dproj">
+            <ProjectGuid>{8EAD710E-5633-447F-9979-3DB62CCDB442}</ProjectGuid>
+            <Configurations>Debug</Configurations>
+            <Platforms>Win32;Win64</Platforms>
+            <Enabled>True</Enabled>
+        </BuildGroupProject>
+        <BuildGroupProject Include="Package1.dproj">
+            <ProjectGuid>{39AE1588-1D8E-4F68-803C-A630DAF1DF9B}</ProjectGuid>
+            <Configurations>Debug</Configurations>
+            <Platforms>Win32</Platforms>
+            <Enabled>True</Enabled>
+        </BuildGroupProject>
+    </ItemGroup>
+</Project>
