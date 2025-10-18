@@ -5,19 +5,22 @@
 interface
 
 uses
-  DUnitX.TestFramework, uPackageOptions;
+  DUnitX.TestFramework, PackageResources;
 
 type
   [TestFixture]
   TTestPackageOptionsObj = class
   protected
-    FPackageOptionsReader: TV0PackageOptions;
+    FPackageOptionsReader: TV0PackageResources;
   public
     [Setup]
     procedure Setup;
 
     [TearDown]
     procedure TearDown;
+
+    [Test]
+    procedure TestClone;
 
     [Test]
     procedure TestDefineCount;
@@ -60,7 +63,7 @@ type
   [TestFixture]
   TTestPackageOptionsWriterObj = class
   protected
-    FPackageOptionsWriter: TV0PackageOptions;
+    FPackageResourcesWriter: TV0PackageResources;
   public
     [Setup]
     procedure Setup;
@@ -78,8 +81,9 @@ uses
 
 procedure TTestPackageOptionsObj.Setup;
 begin
-  FPackageOptionsReader := TV0PackageOptions.Create;
-  FPackageOptionsReader.ReadFromFile('C:\Users\Public\Documents\Embarcadero\Studio\37.0\Bpl\Package1.bpl');
+  var LFileName := 'C:\Users\Public\Documents\Embarcadero\Studio\37.0\Bpl\Package1.bpl';
+  FPackageOptionsReader := TV0PackageResources.Create(LFileName);
+  FPackageOptionsReader.ReadFromFile(LFileName);
 end;
 
 procedure TTestPackageOptionsObj.TearDown;
@@ -90,6 +94,34 @@ end;
 procedure TTestPackageOptionsObj.TestVersion;
 begin
   Assert.AreEqual<Byte>(FPackageOptionsReader.Version, 0);
+end;
+
+procedure TTestPackageOptionsObj.TestClone;
+begin
+  var LV0PackageResources := TV0PackageResources.Create('');
+  Assert.AreEqual<string>(LV0PackageResources.Description, '');
+  Assert.AreEqual<string>(LV0PackageResources.Defines, []);
+  Assert.AreEqual<string>(LV0PackageResources.UnitAliases, []);
+
+  var LDesc1 := 'Description1';
+  LV0PackageResources.Description := LDesc1;
+  LV0PackageResources.Defines := ['A=B', 'C=D'];
+  LV0PackageResources.UnitAliases := ['Unit1=Unit2', 'Unit3=Unit4'];
+
+  Assert.AreEqual<string>(LV0PackageResources.Description, LDesc1);
+  Assert.AreEqual<string>(LV0PackageResources.Defines, ['A=B', 'C=D']);
+  Assert.AreEqual<string>(LV0PackageResources.UnitAliases, ['Unit1=Unit2', 'Unit3=Unit4']);
+
+  var LClonedDest := TV0PackageResources.Create('');
+  Assert.AreEqual<string>(LClonedDest.Description, '');
+  Assert.AreEqual<string>(LClonedDest.Defines, []);
+  Assert.AreEqual<string>(LClonedDest.UnitAliases, []);
+
+  LClonedDest.Clone(LV0PackageResources);
+  Assert.AreEqual<string>(LClonedDest.Description, LDesc1);
+  Assert.AreEqual<string>(LClonedDest.Defines, ['A=B', 'C=D']);
+  Assert.AreEqual<string>(LClonedDest.UnitAliases, ['Unit1=Unit2', 'Unit3=Unit4']);
+
 end;
 
 //procedure TTestPackageOptionsObj.Test2(const AValue1: Integer; const AValue2 : Integer);
@@ -168,8 +200,8 @@ end;
 
 procedure TTestPackageOptionsWriterObj.Setup;
 begin
-  FPackageOptionsWriter := TV0PackageOptions.Create;
   var LFileName := 'C:\Users\Public\Documents\Embarcadero\Studio\37.0\Bpl\Package2.bpl';
+  FPackageResourcesWriter := TV0PackageResources.Create(LFileName);
   ForceDirectories(ExtractFileDir(LFileName));
   if not FileExists(LFileName) then
     begin
@@ -179,44 +211,45 @@ end;
 
 procedure TTestPackageOptionsWriterObj.TearDown;
 begin
-  FreeAndNil(FPackageOptionsWriter);
+  FreeAndNil(FPackageResourcesWriter);
 end;
 
 procedure TTestPackageOptionsWriterObj.TestWrite;
 begin
-  var LPackageOptionsReader := TV0PackageOptions.Create;
+  var LFileName := 'C:\Users\Public\Documents\Embarcadero\Studio\37.0\Bpl\Package2.bpl';
+  var LPackageResourcesReader := TV0PackageResources.Create(LFileName);
   try
-    LPackageOptionsReader.ReadFromFile('C:\Users\Public\Documents\Embarcadero\Studio\37.0\Bpl\Package2.bpl');
+    LPackageResourcesReader.ReadFromFile(LFileName);
 
-    FPackageOptionsWriter.Version := 1;
-    FPackageOptionsWriter.ToggleValues := LPackageOptionsReader.ToggleValues;
-    FPackageOptionsWriter.Defines := LPackageOptionsReader.Defines;
-    FPackageOptionsWriter.AddUnitAlias('A', 'B');
-    FPackageOptionsWriter.AddUnitAlias('C', 'D');
-    FPackageOptionsWriter.DebugInfoValue := Succ(LPackageOptionsReader.DebugInfoValue);
-    FPackageOptionsWriter.MinStackSize := $11112222;
-    FPackageOptionsWriter.MaxStackSize := $33334444;
-    FPackageOptionsWriter.ResourceReserve := Cardinal($444455555);
-    FPackageOptionsWriter.ImageBase := $66667777;
-    FPackageOptionsWriter.Description := 'Hello world';
+    FPackageResourcesWriter.Version := 1;
+    FPackageResourcesWriter.ToggleValues := LPackageResourcesReader.ToggleValues;
+    FPackageResourcesWriter.Defines := LPackageResourcesReader.Defines;
+    FPackageResourcesWriter.AddUnitAlias('A', 'B');
+    FPackageResourcesWriter.AddUnitAlias('C', 'D');
+    FPackageResourcesWriter.DebugInfoValue := Succ(LPackageResourcesReader.DebugInfoValue);
+    FPackageResourcesWriter.MinStackSize := $11112222;
+    FPackageResourcesWriter.MaxStackSize := $33334444;
+    FPackageResourcesWriter.ResourceReserve := Cardinal($444455555);
+    FPackageResourcesWriter.ImageBase := $66667777;
+    FPackageResourcesWriter.Description := 'Hello world';
 
-    FreeAndNil(LPackageOptionsReader);
-    FPackageOptionsWriter.WriteToFile('C:\Users\Public\Documents\Embarcadero\Studio\37.0\Bpl\Package2.bpl');
+    FreeAndNil(LPackageResourcesReader);
+    FPackageResourcesWriter.WriteToFile(LFileName);
 
-    LPackageOptionsReader := TV0PackageOptions.Create;
-    LPackageOptionsReader.ReadFromFile('C:\Users\Public\Documents\Embarcadero\Studio\37.0\Bpl\Package2.bpl');
+    LPackageResourcesReader := TV0PackageResources.Create(LFileName);
+    LPackageResourcesReader.ReadFromFile(LFileName);
 
-    Assert.AreEqual<Byte>(FPackageOptionsWriter.Version, LPackageOptionsReader.Version);
-    Assert.AreEqual(FPackageOptionsWriter.ToggleValues, LPackageOptionsReader.ToggleValues);
-    Assert.AreEqual<string>(FPackageOptionsWriter.Defines, LPackageOptionsReader.Defines);
-    Assert.AreEqual(FPackageOptionsWriter.DebugInfoValue, LPackageOptionsReader.DebugInfoValue);
-    Assert.AreEqual(FPackageOptionsWriter.MinStackSize, LPackageOptionsReader.MinStackSize);
-    Assert.AreEqual(FPackageOptionsWriter.MaxStackSize, LPackageOptionsReader.MaxStackSize);
-    Assert.AreEqual(FPackageOptionsWriter.ResourceReserve, LPackageOptionsReader.ResourceReserve);
-    Assert.AreEqual(FPackageOptionsWriter.ImageBase, LPackageOptionsReader.ImageBase);
-    Assert.AreEqual(FPackageOptionsWriter.Description, LPackageOptionsReader.Description);
+    Assert.AreEqual<Byte>(FPackageResourcesWriter.Version, LPackageResourcesReader.Version);
+    Assert.AreEqual(FPackageResourcesWriter.ToggleValues, LPackageResourcesReader.ToggleValues);
+    Assert.AreEqual<string>(FPackageResourcesWriter.Defines, LPackageResourcesReader.Defines);
+    Assert.AreEqual(FPackageResourcesWriter.DebugInfoValue, LPackageResourcesReader.DebugInfoValue);
+    Assert.AreEqual(FPackageResourcesWriter.MinStackSize, LPackageResourcesReader.MinStackSize);
+    Assert.AreEqual(FPackageResourcesWriter.MaxStackSize, LPackageResourcesReader.MaxStackSize);
+    Assert.AreEqual(FPackageResourcesWriter.ResourceReserve, LPackageResourcesReader.ResourceReserve);
+    Assert.AreEqual(FPackageResourcesWriter.ImageBase, LPackageResourcesReader.ImageBase);
+    Assert.AreEqual(FPackageResourcesWriter.Description, LPackageResourcesReader.Description);
   finally
-    FreeAndNil(LPackageOptionsReader);
+    FreeAndNil(LPackageResourcesReader);
   end;
 end;
 
