@@ -982,10 +982,9 @@ function TCustomPackageResources.GetResourceLangIDs(AModuleHandle: THandle;
 begin
   Result := [];
   if not EnumResourceLanguages(AModuleHandle, AResourceType, AResourceName, @EnumLangsProc, LPARAM(@Result)) then
-  begin
-    // If enumeration completed with no languages found, set error or zero
-    Result := [DefaultLangID];
-  end;
+    begin
+      Result := [DefaultLangID];
+    end;
 end;
 
 function TCustomPackageResources.GetResourceNames(const AFileName: string = ''): TArray<string>;
